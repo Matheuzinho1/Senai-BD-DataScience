@@ -1,0 +1,45 @@
+CREATE DATABASE IF NOT EXISTS comercio
+CHARACTER SET utf8mb4
+COLLATE utf8mb4_unicode_ci;
+
+USE comercio;
+
+CREATE TABLE genero (
+id_genero INT AUTO_INCREMENT PRIMARY KEY,
+descricao VARCHAR(150) NOT NULL
+);
+
+CREATE TABLE cliente (
+id_cliente INT AUTO_INCREMENT PRIMARY KEY,
+nome VARCHAR(150) NOT NULL,
+nome_social VARCHAR(150) NULL,
+data_nascimento DATE NOT NULL,
+id_genero INT NULL,
+data_cadastro DATETIME DEFAULT CURRENT_TIMESTAMP,
+ativo BOOLEAN DEFAULT TRUE,
+FOREIGN KEY (id_genero) REFERENCES genero(id_genero)
+);
+
+CREATE TABLE fornecedor (
+id_fornecedor INT AUTO_INCREMENT PRIMARY KEY,
+nome_fornecedor VARCHAR(150) NOT NULL,
+nome_fantasia VARCHAR(100) NOT NULL,
+cnpj VARCHAR(14) NOT NULL,
+data_cadastro DATETIME DEFAULT CURRENT_TIMESTAMP,
+ativo BOOLEAN DEFAULT TRUE
+);
+
+CREATE TABLE funcionario (
+id_funcionario INT AUTO_INCREMENT PRIMARY KEY,
+nome_funcionario VARCHAR(150) NOT NULL,
+nome_social VARCHAR(150) NULL,
+data_nascimento DATE NOT NULL,
+cargo VARCHAR(100) NOT NULL,
+id_genero INT NULL,
+data_admissao DATETIME DEFAULT CURRENT_TIMESTAMP NOT NULL,
+data_demissao DATETIME DEFAULT CURRENT_TIMESTAMP NULL,
+ativo BOOLEAN DEFAULT TRUE,
+FOREIGN KEY (id_genero) REFERENCES genero(id_genero) 
+);
+
+SELECT * FROM cliente;

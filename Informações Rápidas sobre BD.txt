@@ -1,0 +1,222 @@
+DDL - Linguagem de definição de dados
+
+<-- COMANDOS PARA LINHA -->
+-> CREATE - Para base e para a tabela.
+-> IF NOT EXIST - Verifica se a base já existe.
+-> ALTER - Alteração da base de teste, alteração de toda estrutura, não funciona na produção.
+-> RENAME - Muda o nome.
+-> INT - Número inteiro.
+-> FLOAT - Ponto flutuante ou vírgula. (34.56).
+-> DECIMAL - Valores monetários.
+-> VARCHAR - Letras, números, caracteres especiais ('senai 1.26').
+-> DATE - Inserir valores de data de forma livre.
+-> DATETIME - Usa a data atual do sistema.
+-> DATESTAMP - Usa a data atual do sistema, porém, só se for nulo.
+-> ATOMICIDADE - Cada transação é tratada como uma unidade de trabalho, que é totalmente bem-sucedida ou que falha completamente.
+-> CONSISTÊNCIA - As transações só podem conduzir os dados do bando de dados de um estado válidos para outro estado válido.
+-> OR - ||
+-> AND - &&
+-> DDL - Create, Drop, Use
+-> DCL - Programador de Banco de Dados
+-> DML - Select, Insert, Update, Delete
+
+
+<-- LINHAS DE COMANDOS -->
+-- O comando de criação.
+CREATE DATABASE IF NOT EXISTS comercio;
+
+-- Criando a tabela gênero
+CREATE TABLE genero (
+id_genero INT AUTO_INCREMENT PRIMARY KEY,
+descricao VARCHAR(100) NOT NULL
+);
+
+-- Criando a tabela cliente.
+CREATE TABLE cliente (
+id_cliente INT AUTO_INCREMENT PRIMARY KEY,
+nome VARCHAR(150) NOT NULL,
+nome_social VARCHAR(150) NULL,
+data_nascimento DATE NOT NULL,
+id_genero INT NULL,
+data_cadastro DATETIME DEFAULT CURRENT_TIMESTAMP,
+ativo BOOLEAN DEFAULT TRUE,
+FOREIGN KEY (id_genero) REFERENCES genero(id_genero)
+);
+
+-- Excluindo bando de dados
+DROP DATABASE comercio;
+
+-- Usando o banco de dados
+USE comercio;
+
+-- Detalhes da tabela
+DESCRIBE cliente;
+
+-- Alterando a estrutura da tabela
+ALTER TABLE genero
+ADD ativo BOOLEAN DEFAULT TRUE;
+
+ALTER TABLE genero
+MODIFY descrição VARCHAR(150) NOT NULL;
+
+ALTER TABLE genero 
+CHANGE descrição nome_genero VARCHAR(100) NOT NULL;
+
+ALTER TABLE pedido
+ADD CONSTRAINT fk_pedido_cliente
+FOREIGN KEY (id_cliente)
+REFERENCES cliente(id_cliente);
+
+-- DML LINGUAGEM DE MANIPULAÇÃO DE DADOS
+-> SELECT - Usado para realizar consultas em tabelas e bancos de dados.
+-> INSERT - Usado para inserir dados na tabela.
+
+-- Alterando uma tabela.
+ALTER TABLE funcionario 
+ADD CONSTRAINT fk_funcionario_genero FOREIGN KEY (id_genero) REFERENCES genero(id_genero);
+
+-- Inserindo Dados.
+INSERT INTO funcionario(nome_funcionário, nome_social, data_nascimento, data_admissao, cargo, ativo) VALUES ('Matheus', '', '2008-11-16', '2025-03-05', 'Teste', true);
+
+-- Comando Update.
+UPDATE funcionario 
+SET nome_funcionario = "Mateus"
+WHERE id_funcionario = 4 
+
+-- Comando Delete.
+DELETE funcionario
+WHERE nome = 'Matheus';
+
+DELETE funcionario
+WHERE ativo = false;
+
+DELETE funcionario
+WHERE data_cadastro < '2023-01-01'; 
+
+-- Contar o número de linhas.
+SELECT COUNT(*) FROM tabela;
+SELECT COUNT(DISCTINCT coluna) FROM tabela;
+
+-- Somar os valores de uma coluna.
+SELECT SUM(valor) FROM vendas;
+
+-- Calcular a média dos valores.
+SELECT AVG(nota) FROM alunos;
+
+-- Retorna o menor/maior valor.
+SELECT MIN(data), MAX(data) FROM eventos;
+
+-- Mostrando em ordem decrecente ou crescente
+SELECT * FROM cliente ORDER BY cliente.nome ASC;
+SELECT * FROM cliente ORDER BY cliente.data_nascimento DESC;
+
+-- Exibindo só o nome
+SELECT cliente.nome FROM cliente ORDER BY cliente.data_nascimento DESC;
+
+-- Exibindo com um determinado filtro
+SELECT nome, data_nascimento FROM cliente WHERE id_cliente = 125;
+SELECT nome, data_nascimento FROM cliente WHERE data_cadastro < '2000-01-01' DESC;
+SELECT nome, data_nascimento FROM cliente WHERE nome 	 'Matheus%';
+SELECT nome, data_nascimento FROM cliente WHERE nome LIKE '%santos%' AND ativo = 1;
+
+-- Filtrando e agrupando a resposta
+SELECT ativo, COUNT(*) FROM cliente WHERE nome LIKE 'ana%' GROUP BY ativo;
+
+-- Nomeando o "COUNT(*)"
+SELECT ativo, COUNT(*) AS Total_Ativo FROM cliente WHERE nome LIKE 'ana%' GROUP BY ativo;
+
+-- Somando valor total de uma tabela
+SELECT SUM(valor_total_pedido) AS Total FROM pedido;
+SELECT id_pedido, SUM(valor_total_pedido) AS Total FROM pedido GROUP BY id_pedido;
+	
+-- Limitando os resultados
+SELECT id_pedido, SUM(valor_total_pedido) AS Total FROM pedido GROUP BY id_pedido LIMIT  10;
+
+-- Calculando Media
+SELECT AVG(valor_total_pedido) AS total_pedido FROM pedido;
+
+-- Adicionais
+SELECT * FROM pedido WHERE id_cliente = 1;
+SELECT nome, data_nascimento FROM cliente ORDER BY data_nascimento DESC;
+
+-- Contar
+SELECT ativo, COUNT(*) AS Total_Ativo FROM cliente WHERE nome LIKE 'ana%' GROUP BY ativo;
+SELECT ativo, COUNT(*) FROM cliente WHERE data_nascimento > '2000-01-01' GROUP BY ativo;
+SELECT ativo, COUNT(*) FROM cliente WHERE data_nascimento > '2000-01-01' GROUP BY ativo;
+
+-- Somar
+SELECT SUM(valor_total_pedido) AS Total FROM pedido;
+SELECT id_pedido, SUM(valor_total_pedido) AS Total FROM pedido GROUP BY id_pedido;
+SELECT id_pedido, SUM(valor_total_pedido) AS Total FROM pedido GROUP BY id_pedido LIMIT 10;
+
+-- Max e Min
+SELECT MAX(valor_total_pedido) AS total_pedido FROM pedido;
+SELECT MIN(valor_total_pedido) AS total_pedido FROM pedido;
+
+-- Inner Join
+SELECT cliente.nome, contato.telefone FROM cliente INNER JOIN contato ON cliente.id_cliente = contato.id_cliente;
+SELECT cliente.nome, endereco.logradouro, endereco.cidade FROM cliente INNER JOIN endereco ON cliente.id_cliente = endereco.id_cliente;
+SELECT pedido.id_pedido, cliente.nome FROM cliente INNER JOIN pedido ON pedido.id_cliente = cliente.id_cliente;
+-- Exercício Inner Join
+SELECT pedido.id_pedido, pedido.data_venda, cliente.nome, 
+documento.tipo_documento, endereco.logradouro, 
+endereco.bairro, endereco.cidade, endereco.uf 
+FROM pedido 
+INNER JOIN cliente ON pedido.id_cliente = cliente.id_cliente 
+INNER JOIN documento ON documento.id_cliente = cliente.id_cliente
+INNER JOIN endereco ON endereco.id_cliente
+WHERE tipo_documento = 'CPF';
+
+-- Contagem de clientes ativos e inativos
+SELECT ativo, COUNT(*) AS total_Clientes FROM cliente GROUP BY ativo;
+
+-- Listagem de produtos com valor de venda cima da média
+SELECT nome_produto, valor_venda FROM produto 
+WHERE valor_venda > (SELECT AVG(valor_venda) FROM produto)
+ORDER BY valor_venda DESC;
+
+-- Analise de funcionarios por cargo
+SELECT cargo, COUNT(*) AS total_Funcionarios FROM funcionario
+WHERE ativo = TRUE
+GROUP BY cargo 
+ORDER BY total_funcionarios DESC;
+
+-- Pedidos por status
+SELECT status_venda, COUNT(*) AS total_pedidos FROM pedido
+GROUP BY status_venda
+ORDER BY total_pedidos ASC;
+
+-- Produtos por categoria
+SELECT categoria.nome_categoria, COUNT(produto.id_produto) AS total_produtos
+FROM produto 
+INNER JOIN categoria ON produto.id_categoria = categoria.id_categoria
+GROUP BY categoria.nome_categoria
+ORDER BY total_produtos DESC;
+
+-- Formas de pagamentos mais utilizadas
+SELECT forma_pagamento.tipo_pagamento, COUNT(pedido.id_pedido) as total_pagamentos
+FROM forma_pagamento
+INNER JOIN pedido ON forma_pagamento.id_pagamento = pedido.id_pagamento
+GROUP BY forma_pagamento.tipo_pagamento
+ORDER BY total_pagamentos ASC;
+
+-- Tipos de entrega mais comum
+SELECT tipo_entrega.tipo_entrega, COUNT(pedido.id_pedido) AS total_entrega 
+FROM tipo_entrega 
+INNER JOIN pedido ON tipo_entrega.id_tipo_entrega = pedido.id_tipo_entrega
+GROUP BY tipo_entrega.tipo_entrega
+ORDER BY total_entrega ASC;
+
+-- Clientes sem pedidos
+SELECT cliente.id_cliente, cliente.nome FROM cliente
+LEFT JOIN pedido
+ON cliente.id_cliente = pedido.id_cliente
+WHERE pedido.id_pedido IS NULL;
+
+-- Produtos com estoque abaixo do mínimo
+SELECT produto.nome_produto, estoque.quantidade, estoque.quantidade_minima
+FROM produto
+LEFT JOIN estoque
+ON estoque.id_produto = produto.id_produto
+WHERE estoque.quantidade < estoque.quantidade_minima
+ORDER BY quantidade_minima DESC;
